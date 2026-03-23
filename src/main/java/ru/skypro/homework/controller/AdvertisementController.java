@@ -1,5 +1,11 @@
 package ru.skypro.homework.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -69,5 +75,36 @@ public class AdvertisementController {
     public ResponseEntity<List<Ad>> getMyAds() {
 
         return ResponseEntity.ok(List.of());
+    }
+    /**
+     * PATCH /ads/{id}/image - Обновление картинки объявления
+     */
+    @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Обновление картинки объявления",
+            operationId = "updateImage",
+            tags = {"Объявления"}
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "OK",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                    schema = @Schema(type = "array", format = "binary")
+            )
+    )
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+    @ApiResponse(responseCode = "403", description = "Forbidden")
+    @ApiResponse(responseCode = "404", description = "Not found")
+    public ResponseEntity<byte[]> updateImage(
+            @Parameter(description = "ID объявления", required = true, example = "123")
+            @PathVariable Integer id,
+
+            @RequestParam("image") MultipartFile file) {
+
+        // TODO: Реализовать логику сохранения изображения
+
+        // Пустой ответ-плейсхолдер
+        return ResponseEntity.ok().build();
     }
 }
