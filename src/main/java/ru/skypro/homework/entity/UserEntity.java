@@ -29,9 +29,9 @@ public class UserEntity {
 
     private String phone;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RoleEnum role;
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private RoleEnum role;
 
     private String image;
     private  String password;
@@ -40,4 +40,8 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private RoleEntity role;
 }

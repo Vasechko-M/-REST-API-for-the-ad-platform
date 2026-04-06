@@ -1,4 +1,5 @@
 package ru.skypro.homework.service.impl;
+import ru.skypro.homework.repository.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.User;
+import ru.skypro.homework.entity.RoleEntity;
 import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.UserRepository;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
     private static final String UPLOAD_DIR = "images/";
 
     @Override
@@ -115,5 +118,17 @@ public class UserServiceImpl implements UserService {
         user.setImage("/images/" + fileName);
 
         userRepository.save(user);
+    }
+    /**
+     * Метод для регистрации нового пользователя с ролью USER
+     */
+    public void registerUser(User userDto, String password) {
+        UserEntity userEntity = userMapper.toEntity(userDto);
+        userEntity.setPassword(passwordEncoder.encode(password));
+        // Получаем роль "USER"
+        RoleEntity role = roleRepository.findByName("USER")
+                .orElseThrow(() -> new RuntimeException("Роль USER не найдена"));
+        userEntity.setRole(role);
+        userRepository.save(userEntity);
     }
 }

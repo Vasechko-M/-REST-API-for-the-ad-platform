@@ -10,4 +10,5 @@ public interface UserService {
     User getCurrentUser(String email);
     UpdateUser updateUser(UpdateUser updateUser, String email);
     void updateUserImage(MultipartFile file, String email);
+    void registerUser(User user, String password);
 }
