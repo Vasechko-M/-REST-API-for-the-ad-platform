@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 import ru.skypro.homework.service.UserService;
+import lombok.Data;
 
 import javax.validation.Valid;
 
@@ -110,6 +111,33 @@ public class UserController {
         userService.updateUserImage(file, email);
 
         return ResponseEntity.ok().build();
+
+    }
+
+    /**
+     * POST /users/register - Регистрация нового пользователя
+     */
+    @PostMapping("/register")
+    @Operation(summary = "Регистрация нового пользователя", operationId = "registerUser")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Данные нового пользователя с паролем",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RegisterUserRequest.class)
+            )
+    )
+    @ApiResponse(responseCode = "201", description = "Пользователь зарегистрирован")
+    public ResponseEntity<Void> registerUser(@Valid @RequestBody RegisterUserRequest request) {
+        userService.registerUser(request.getUser(), request.getPassword());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // Вспомогательный класс для запроса регистрации
+    @Data
+    public static class RegisterUserRequest {
+        private User user;
+        private String password;
 
     }
 }

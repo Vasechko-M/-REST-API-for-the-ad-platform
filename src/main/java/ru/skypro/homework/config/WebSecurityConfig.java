@@ -1,15 +1,20 @@
 package ru.skypro.homework.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.skypro.homework.dto.Role;
+
+import javax.sql.DataSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -25,18 +30,42 @@ public class WebSecurityConfig {
             "/register"
     };
 
+    @Value("${spring.datasource.url}")
+    private String datasourceUrl;
+
+    @Value("${spring.datasource.username}")
+    private String datasourceUsername;
+
+    @Value("${spring.datasource.password}")
+    private String datasourcePassword;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String datasourceDriverClassName;
+
+    /**
+     * Создаем DataSource, параметры которого получены из application.properties
+     */
     @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user =
-                User.builder()
-                        .username("user@gmail.com")
-                        .password("password")
-                        .passwordEncoder(passwordEncoder::encode)
-                        .roles(Role.USER.name())
-                        .build();
-        return new InMemoryUserDetailsManager(user);
+    public DataSource dataSource() {
+        return org.springframework.boot.jdbc.DataSourceBuilder.create()
+                .url(datasourceUrl)
+                .username(datasourceUsername)
+                .password(datasourcePassword)
+                .driverClassName(datasourceDriverClassName)
+                .build();
     }
 
+    /**
+     * Используем JdbcUserDetailsManager, чтобы работать с базой данных
+     */
+    @Bean
+    public UserDetailsService userDetailsService(DataSource dataSource) {
+        return new JdbcUserDetailsManager(dataSource);
+    }
+
+    /**
+     * Настраиваем SecurityFilterChain
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf()
@@ -54,6 +83,9 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Бин для хэширования паролей bcrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
