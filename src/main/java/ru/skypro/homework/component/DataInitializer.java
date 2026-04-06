@@ -3,7 +3,7 @@ package ru.skypro.homework.component;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.entity.RoleEntity;
-import ru.skypro.homework.service.RoleRepository;
+import ru.skypro.homework.repository.RoleRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
