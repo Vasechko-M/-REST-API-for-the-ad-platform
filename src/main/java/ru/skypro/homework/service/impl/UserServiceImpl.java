@@ -32,9 +32,6 @@ public class UserServiceImpl implements UserService {
 
     private static final String UPLOAD_DIR = "images/";
 
-    /**
-     * Смена пароля (только сам пользователь или ADMIN)
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public void changePassword(NewPassword newPassword, String email) {
@@ -50,9 +47,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Получение текущего пользователя
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public User getCurrentUser(String email) {
@@ -63,9 +57,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
-    /**
-     * Обновление профиля
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public UpdateUser updateUser(UpdateUser updateUser, String email) {
@@ -94,9 +85,6 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    /**
-     * Обновление аватара
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public void updateUserImage(MultipartFile file, String email) {
@@ -127,9 +115,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Регистрация пользователя
-     */
     public void registerUser(User userDto, String password) {
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Пользователь с таким email уже существует");

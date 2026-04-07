@@ -11,8 +11,20 @@ public interface AdService {
     List<Ad> getAllAds();
     Ad createAd(CreateOrUpdateAd adDto, MultipartFile image, String authorEmail);
     Ad getAdById(Long id);
+
+    /**
+     * Удаляет объявление, если у пользователя есть доступ.
+     */
     void deleteAd(Long id);
+
+    /**
+     * Обновляет поля объявления, если у пользователя есть доступ.
+     */
     AdvertisementEntity updateAd(Long id, CreateOrUpdateAd request);
     List<AdvertisementEntity> getMyAds(String email);
+
+    /**
+     * Обновляет изображение объявления, если у пользователя есть доступ.
+     */
     AdvertisementEntity updateAdImage(Long id, MultipartFile file);
 }
