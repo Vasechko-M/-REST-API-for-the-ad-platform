@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean login(String userName, String password) {
-        if (!manager.userExists(userName)) {
+        if (userRepository.findByEmail(userName).isEmpty()) {
             return false;
         }
         UserDetails userDetails = manager.loadUserByUsername(userName);
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean register(Register register) {
-        if (manager.userExists(register.getUsername())) {
+        if (userRepository.findByEmail(register.getUsername()).isPresent()) {
             return false;
         }
 
