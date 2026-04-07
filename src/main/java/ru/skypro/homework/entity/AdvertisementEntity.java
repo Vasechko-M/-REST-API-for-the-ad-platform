@@ -17,6 +17,8 @@ public class AdvertisementEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    private String imagePath;
+
     private String title;
 
     private String description;
@@ -31,4 +33,12 @@ public class AdvertisementEntity {
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 }

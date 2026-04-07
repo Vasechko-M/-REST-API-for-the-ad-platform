@@ -1,5 +1,7 @@
 package ru.skypro.homework.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Ad {
     private Integer pk;          // id объявления
     private Integer author;      // id автора объявления
@@ -48,5 +50,10 @@ public class Ad {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    @JsonProperty("image")
+    public String getImageUrl() {
+        return "/images/" + this.getPk();
     }
 }
