@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.Comment;
@@ -23,73 +24,66 @@ import java.util.List;
 @Validated
 @Tag(name = "Комментарии", description = "Управление комментариями объявлений")
 public class CommentController {
+
     private final CommentService commentService;
+
     /**
-     * GET /ads/{adId}/comments — Получение комментариев объявления
+     * Получение комментариев объявления
      */
     @Operation(summary = "Получение комментариев объявления", operationId = "getComments")
     @ApiResponse(responseCode = "200", description = "Успешное получение комментариев",
             content = @Content(schema = @Schema(implementation = Comment.class)))
-    @ApiResponse(responseCode = "401", description = "Не авторизован")
     @GetMapping
     public ResponseEntity<List<Comment>> getComments(
             @Parameter(description = "ID объявления", required = true)
-            @PathVariable Long adId) {
+            @PathVariable Integer adId) {
 
-        List<Comment> comments = commentService.getCommentsByAdId(adId);
-        return ResponseEntity.ok(comments);
+        return ResponseEntity.ok(commentService.getCommentsByAdId(adId));
     }
 
     /**
-     * POST /ads/{adId}/comments — Добавление комментария к объявлению
+     * Добавление комментария (через SecurityContext)
      */
     @Operation(summary = "Добавление комментария", operationId = "addComment")
     @ApiResponse(responseCode = "201", description = "Комментарий создан",
             content = @Content(schema = @Schema(implementation = Comment.class)))
-    @ApiResponse(responseCode = "401", description = "Не авторизован")
     @PostMapping
     public ResponseEntity<Comment> addComment(
-            @PathVariable Long adId,
+            @PathVariable Integer adId,
             @Valid @RequestBody CreateOrUpdateComment commentRequest,
-            @RequestHeader("X-User-Id") Long authorId) {
-        // TODO: Реализация добавления комментария
-        Comment newComment = commentService.addComment(adId, commentRequest, authorId);
+            Authentication authentication) {
+        Comment newComment = commentService.addComment(adId, commentRequest, authentication.getName());
+
         return ResponseEntity.status(201).body(newComment);
     }
 
     /**
-     * PATCH /ads/{adId}/comments/{commentId} — Обновление комментария
+     * Обновление комментария (проверка через @PreAuthorize в сервисе)
      */
     @Operation(summary = "Обновление комментария", operationId = "updateComment")
     @ApiResponse(responseCode = "200", description = "Комментарий обновлен",
             content = @Content(schema = @Schema(implementation = Comment.class)))
-    @ApiResponse(responseCode = "401", description = "Не авторизован")
-    @ApiResponse(responseCode = "404", description = "Комментарий не найден")
     @PatchMapping("/{commentId}")
     public ResponseEntity<Comment> updateComment(
-            @PathVariable Long adId,
-            @PathVariable Long commentId,
-            @Valid @RequestBody CreateOrUpdateComment commentRequest,
-            @RequestHeader("X-User-Id") Integer authorId) {
-        // TODO: Реализация обновления комментария
-        Comment updatedComment = commentService.updateComment(adId, commentId, commentRequest, authorId);
+            @PathVariable Integer adId,
+            @PathVariable Integer commentId,
+            @Valid @RequestBody CreateOrUpdateComment commentRequest) {
+
+        Comment updatedComment = commentService.updateComment(adId, commentId, commentRequest);
         return ResponseEntity.ok(updatedComment);
     }
 
     /**
-     * DELETE /ads/{adId}/comments/{commentId} — Удаление комментария
+     * Удаление комментария (проверка через @PreAuthorize в сервисе)
      */
     @Operation(summary = "Удаление комментария", operationId = "deleteComment")
     @ApiResponse(responseCode = "204", description = "Комментарий удален")
-    @ApiResponse(responseCode = "401", description = "Не авторизован")
-    @ApiResponse(responseCode = "404", description = "Комментарий не найден")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Long adId,
-            @PathVariable Long commentId,
-            @RequestHeader("X-User-Id") Long authorId // текущий пользователь
-    ) {
-        commentService.deleteComment(adId, commentId, authorId);
+            @PathVariable Integer adId,
+            @PathVariable Integer commentId) {
+
+        commentService.deleteComment(adId, commentId);
         return ResponseEntity.noContent().build();
     }
 }

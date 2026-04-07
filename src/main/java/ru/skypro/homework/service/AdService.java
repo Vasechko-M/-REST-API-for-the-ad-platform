@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface AdService {
     List<Ad> getAllAds();
-    Ad createAd(CreateOrUpdateAd adDto, MultipartFile image, Long authorId);
+    Ad createAd(CreateOrUpdateAd adDto, MultipartFile image, String authorEmail);
     Ad getAdById(Long id);
     void deleteAd(Long id);
     AdvertisementEntity updateAd(Long id, CreateOrUpdateAd request);

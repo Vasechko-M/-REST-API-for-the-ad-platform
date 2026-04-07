@@ -3,24 +3,28 @@ package ru.skypro.homework.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 import javax.sql.DataSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
+            "/swagger-ui/**",
             "/swagger-ui.html",
-            "/v3/api-docs",
+            "/v3/api-docs/**",
             "/webjars/**",
             "/login",
             "/register"
@@ -56,7 +60,15 @@ public class WebSecurityConfig {
      */
     @Bean
     public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        return new JdbcUserDetailsManager(dataSource);
+        JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
+        manager.setUsersByUsernameQuery(
+                "select email, password, coalesce(enabled, true) from users where email = ?"
+        );
+        manager.setAuthoritiesByUsernameQuery(
+                "select u.email, concat('ROLE_', r.name) " +
+                        "from users u join roles r on u.role_id = r.id where u.email = ?"
+        );
+        return manager;
     }
 
     /**
@@ -71,7 +83,15 @@ public class WebSecurityConfig {
                                 authorization
                                         .mvcMatchers(AUTH_WHITELIST)
                                         .permitAll()
-                                        .mvcMatchers("/ads/**", "/users/**")
+                                        .mvcMatchers(HttpMethod.POST, "/users/register")
+                                        .permitAll()
+                                        .mvcMatchers(HttpMethod.GET, "/ads/**")
+                                        .permitAll()
+                                        .mvcMatchers("/users/**")
+                                        .hasAnyRole("USER", "ADMIN")
+                                        .mvcMatchers("/ads/**")
+                                        .hasAnyRole("USER", "ADMIN")
+                                        .anyRequest()
                                         .authenticated())
                 .cors()
                 .and()

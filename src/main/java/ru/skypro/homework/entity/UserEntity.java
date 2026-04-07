@@ -35,6 +35,10 @@ public class UserEntity {
 
     private String image;
     private  String password;
+
+    @Column(nullable = false)
+    private Boolean enabled = true;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<AdvertisementEntity> ads;
 

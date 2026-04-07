@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,9 +51,9 @@ public class AdvertisementController {
     public ResponseEntity<Ad> createAd(
             @RequestPart("properties") @Valid CreateOrUpdateAd properties,
             @RequestPart("image") MultipartFile image,
-            @RequestHeader("X-User-Id") Long authorId // текущий пользователь
+            Authentication authentication
     ) {
-        Ad newAd = adService.createAd(properties, image, authorId);
+        Ad newAd = adService.createAd(properties, image, authentication.getName());
         return ResponseEntity.status(201).body(newAd);
     }
 

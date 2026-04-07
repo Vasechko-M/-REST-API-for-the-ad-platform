@@ -6,8 +6,12 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 import java.util.List;
 
 public interface CommentService {
-    List<Comment> getCommentsByAdId(Long adId);
-    Comment addComment(Long adId, CreateOrUpdateComment commentRequest, Long authorId);
-    Comment updateComment(Long adId, Long commentId, CreateOrUpdateComment commentRequest, Integer authorId);
-    void deleteComment(Long adId, Long commentId, Long authorId);
+
+    List<Comment> getCommentsByAdId(Integer adId);
+
+    Comment addComment(Integer adId, CreateOrUpdateComment commentRequest, String authorEmail);
+
+    Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateComment commentRequest);
+
+    void deleteComment(Integer adId, Integer commentId);
 }

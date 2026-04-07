@@ -2,6 +2,7 @@ package ru.skypro.homework.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.Comment;
+import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.entity.CommentEntity;
 
 import java.time.ZoneId;
@@ -26,6 +27,12 @@ public class CommentMapper {
         }
 
         return dto;
+    }
+
+    public CommentEntity toEntity(CreateOrUpdateComment dto) {
+        CommentEntity entity = new CommentEntity();
+        entity.setText(dto.getText());
+        return entity;
     }
 
 }

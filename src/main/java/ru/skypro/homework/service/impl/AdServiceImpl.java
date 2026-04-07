@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +32,6 @@ public class AdServiceImpl implements AdService {
         this.adRepository = adRepository;
         this.adMapper = adMapper;
         this.userRepository = userRepository;
-        // создаём папку, если её нет
         new File(uploadDir).mkdirs();
     }
 
@@ -41,29 +41,29 @@ public class AdServiceImpl implements AdService {
         return ads.stream()
                 .map(adMapper::toDto)
                 .toList();
-    } @Override
-    public Ad createAd(CreateOrUpdateAd adDto, MultipartFile image, Long authorId) {
+    }
+    @Override
+    public Ad createAd(CreateOrUpdateAd adDto, MultipartFile image, String authorEmail) {
         AdvertisementEntity entity = adMapper.toEntity(adDto);
 
-        // Загружаем изображение
-        try {
-            if (image != null && !image.isEmpty()) {
-                // Здесь можно сохранять файл локально или в облако и сохранять ссылку
-                // Пример: сохраняем имя файла как ссылка (для простоты)
-                entity.setImage("/images/" + image.getOriginalFilename());
+        if (image != null && !image.isEmpty()) {
+            try {
+                // Создаем уникальное имя файла
+                String filename = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+                Path filepath = Paths.get(uploadDir, filename);
+                Files.copy(image.getInputStream(), filepath);
+                // Указываем путь к изображению для клиента
+                entity.setImage("/images/" + filename);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при сохранении изображения", e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при загрузке изображения", e);
         }
 
-        // Устанавливаем автора
-        UserEntity author = userRepository.findById(authorId)
+        UserEntity author = userRepository.findByEmail(authorEmail)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         entity.setAuthor(author);
 
-        // Сохраняем в БД
         AdvertisementEntity saved = adRepository.save(entity);
-
         return adMapper.toDto(saved);
     }
     @Override
@@ -72,30 +72,51 @@ public class AdServiceImpl implements AdService {
                 .orElseThrow(() -> new RuntimeException("Объявление не найдено"));
         return adMapper.toDto(ad);
     }
+    /**
+     * Удаление объявления.
+     * Используем @PreAuthorize для проверки прав.
+     * Пользователь может удалить только свою объяву или если имеет роль ROLE_ADMIN.
+     */
+    @PreAuthorize("@adSecurity.hasAccess(#id)")
     @Override
     public void deleteAd(Long id) {
         AdvertisementEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Объявление не найдено"));
+
         adRepository.delete(ad);
     }
-    // Метод обновления объявления
+
+
+    /**
+     * Обновление объявления.
+     * Плюс проверка доступа с помощью @PreAuthorize.
+     */
+    @PreAuthorize("@adSecurity.hasAccess(#id)")
+    @Override
     public AdvertisementEntity updateAd(Long id, CreateOrUpdateAd request) {
         AdvertisementEntity existingAd = adRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
 
-        // Обновляем только поля, которые пришли в запросе
         if (request.getTitle() != null) existingAd.setTitle(request.getTitle());
         if (request.getPrice() != null) existingAd.setPrice(request.getPrice());
         if (request.getDescription() != null) existingAd.setDescription(request.getDescription());
 
         return adRepository.save(existingAd);
     }
+
+
     public List<AdvertisementEntity> getMyAds(String email) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
 
         return adRepository.findAllByAuthor(user);
     }
+    /**
+     * Обновление изображения объявления.
+     * Также с проверкой доступа через @PreAuthorize.
+     */
+    @PreAuthorize("@adSecurity.hasAccess(#id)")
+    @Override
     public AdvertisementEntity updateAdImage(Long id, MultipartFile file) {
         AdvertisementEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
@@ -107,14 +128,20 @@ public class AdServiceImpl implements AdService {
         try {
             String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path filepath = Paths.get(uploadDir, filename);
-            Files.write(filepath, file.getBytes());
-
-            // Сохраняем путь к файлу в сущности
-            ad.setImage("/" + uploadDir + filename); // путь можно настроить под фронтенд
+            Files.copy(file.getInputStream(), filepath);
+            ad.setImage("/images/" + filename);
             return adRepository.save(ad);
-
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка при сохранении файла", e);
+            throw new RuntimeException("Ошибка при сохранении изображения", e);
         }
+    }
+    /**
+     * Проверка: является ли пользователь автором объявления.
+     * Можно использовать внутри методов или через @PreAuthorize.
+     */
+    public boolean isAuthor(Long adId, String username) {
+        AdvertisementEntity ad = adRepository.findById(adId)
+                .orElseThrow(() -> new RuntimeException("Объявление не найдено"));
+        return ad.getAuthor().getEmail().equals(username);
     }
 }

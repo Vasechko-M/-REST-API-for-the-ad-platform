@@ -136,7 +136,11 @@ public class UserController {
     // Вспомогательный класс для запроса регистрации
     @Data
     public static class RegisterUserRequest {
+        @Valid
         private User user;
+
+        @javax.validation.constraints.NotBlank(message = "Пароль обязателен")
+        @javax.validation.constraints.Size(min = 6, message = "Пароль должен содержать минимум 6 символов")
         private String password;
 
     }
