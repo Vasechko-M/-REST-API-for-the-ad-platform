@@ -17,14 +17,12 @@ import javax.sql.DataSource;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
-            "/swagger-ui/**",
             "/swagger-ui.html",
-            "/v3/api-docs/**",
+            "/v3/api-docs",
             "/webjars/**",
             "/login",
             "/register",
@@ -61,15 +59,7 @@ public class WebSecurityConfig {
      */
     @Bean
     public UserDetailsManager userDetailsManager(DataSource dataSource) {
-        JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
-        manager.setUsersByUsernameQuery(
-                "select email, password, coalesce(enabled, true) from users where email = ?"
-        );
-        manager.setAuthoritiesByUsernameQuery(
-                "select u.email, concat('ROLE_', r.name) " +
-                        "from users u join roles r on u.role_id = r.id where u.email = ?"
-        );
-        return manager;
+        return new JdbcUserDetailsManager(dataSource);
     }
 
     /**
@@ -84,6 +74,7 @@ public class WebSecurityConfig {
                                 authorization
                                         .mvcMatchers(AUTH_WHITELIST)
                                         .permitAll()
+                                        .mvcMatchers("/ads/**", "/users/**")
                                         .mvcMatchers(HttpMethod.POST, "/users/register")
                                         .permitAll()
                                         .mvcMatchers(HttpMethod.GET, "/ads/**")

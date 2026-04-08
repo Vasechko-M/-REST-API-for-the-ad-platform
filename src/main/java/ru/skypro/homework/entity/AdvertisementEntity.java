@@ -18,6 +18,8 @@ public class AdvertisementEntity {
     @Column(name = "id")
     private Integer id;
 
+    private String imagePath;
+
     @Column(name = "title")
     private String title;
 
@@ -36,4 +38,12 @@ public class AdvertisementEntity {
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL)
     private List<CommentEntity> comments;
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 }

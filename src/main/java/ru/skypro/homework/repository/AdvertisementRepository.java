@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface AdvertisementRepository extends JpaRepository<AdvertisementEntity, Long> {
 List<AdvertisementEntity> findAllByAuthor(UserEntity author);
+
+    Optional<Object> findAuthorEmailById(Long adId);
 }
