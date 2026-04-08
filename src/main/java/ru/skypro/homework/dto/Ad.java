@@ -2,7 +2,9 @@ package ru.skypro.homework.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 public class Ad {
+
     private Integer pk;
     private Integer author;
     private String image;
@@ -52,8 +54,27 @@ public class Ad {
         this.title = title;
     }
 
+    /**
+     * Для фронта: формирует URL изображения на основе pk объявления
+     */
     @JsonProperty("image")
     public String getImageUrl() {
-        return "/images/" + this.getPk();
+        if (this.pk == null) {
+            return null;
+        }
+        return "/images/" + this.pk;
     }
+
+//    /**
+//     * Статический метод для быстрого создания DTO из Entity
+//     */
+//    public static Ad fromEntity(ru.skypro.homework.entity.AdEntity entity) {
+//        Ad ad = new Ad();
+//        ad.setPk(entity.getId());
+//        ad.setAuthor(entity.getAuthor().getId());
+//        ad.setPrice(entity.getPrice());
+//        ad.setTitle(entity.getTitle());
+//        ad.setImage(entity.getImagePath());
+//        return ad;
+//    }
 }

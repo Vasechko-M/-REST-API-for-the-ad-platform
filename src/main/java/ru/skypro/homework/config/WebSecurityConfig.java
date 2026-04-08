@@ -3,6 +3,8 @@ package ru.skypro.homework.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,6 +35,12 @@ public class WebSecurityConfig {
         return new CustomUserDetailsService(userRepository);
     }
 
+    @Bean public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder()); return provider;
+    }
+
     /**
      * Настройка CORS для Swagger и фронтенда
      */
@@ -53,8 +61,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .cors() // подключаем CORS
-                .and()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 new AntPathRequestMatcher("/swagger-ui/**"),
@@ -79,7 +85,7 @@ public class WebSecurityConfig {
                                 new AntPathRequestMatcher("/ads/**"),
                                 new AntPathRequestMatcher("/images/upload", "POST"),
                                 new AntPathRequestMatcher("/users/**")
-                        ).hasAnyRole("USER", "ADMIN")
+                        ).permitAll()
 
                         .anyRequest().authenticated()
                 )

@@ -61,30 +61,23 @@ public class AdvertisementController {
     /**
      * POST /ads - Создание нового объявления
      */
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Создание объявления", operationId = "createAd")
     @ApiResponse(responseCode = "201", description = "Создано",
             content = @Content(schema = @Schema(implementation = Ad.class)))
     public ResponseEntity<Ad> createAd(
-//            @RequestParam String title,
-//            @RequestParam Integer price,
-//            @RequestParam String description,
-            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestPart("properties") @Valid CreateOrUpdateAd dto,
+            @RequestPart(value = "image", required = false) MultipartFile image,
             Authentication authentication) {
-
-        log.info("=== CONTROLLER INVOKED ===");
 
         String email = authentication.getName();
 
-//        CreateOrUpdateAd dto = new CreateOrUpdateAd();
-//        dto.setTitle(title);
-//        dto.setPrice(price);
-//        dto.setDescription(description);
+        Ad newAd = adService.createAd(dto, image, email);
 
-//        Ad newAd = adService.createAd(dto, image, email);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(newAd);
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED).body(newAd);
     }
+
 
     /**
      * DELETE /ads/{id} - Удаление объявления

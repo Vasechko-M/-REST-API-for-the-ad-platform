@@ -1,11 +1,14 @@
 package ru.skypro.homework.service;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.repository.UserRepository;
+
+import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,12 +21,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        String roleName = Optional.ofNullable(user.getRole())
+                .map(role -> role.getName())
+                .orElse("USER");
+
+        String authority = roleName.startsWith("ROLE_")
+                ? roleName
+                : "ROLE_" + roleName;
+
         return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail()) // email вместо username
+                .withUsername(user.getEmail())
                 .password(user.getPassword())
-                .roles(user.getRole().getName())
+                .authorities(authority)
+                .disabled(!Boolean.TRUE.equals(user.getEnabled()))
                 .build();
     }
 }

@@ -9,9 +9,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.service.ImageService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +22,6 @@ public class ImageServiceImpl implements ImageService {
     @Value("${images.upload.dir:./uploads/images}")
     private String uploadDir;
 
-    // Допустимые типы файлов
     private static final List<String> ALLOWED_CONTENT_TYPES = Arrays.asList(
             "image/jpeg",
             "image/png",
@@ -38,19 +36,16 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String saveImage(MultipartFile file) {
-        // 1. Проверка на пустой файл
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Файл пустой");
         }
 
-        // 2. Проверка типа файла (Content-Type)
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Неподдерживаемый тип файла. Разрешены: JPEG, PNG, GIF, WEBP, BMP");
         }
 
-        // 3. Проверка расширения файла
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Имя файла отсутствует");
@@ -68,23 +63,21 @@ public class ImageServiceImpl implements ImageService {
         }
 
         try {
-            // 4. Создаем директорию если не существует
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
                 log.info("Создана директория для загрузки изображений: {}", uploadPath.toAbsolutePath());
             }
 
-            // 5. Генерируем уникальное имя файла (UUID)
             String filename = UUID.randomUUID().toString() + extension;
-
-            // 6. Сохраняем файл
             Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath);
+
+            try (InputStream is = file.getInputStream()) {
+                Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+            }
 
             log.info("Сохранено изображение: {} (размер: {} байт)", filePath, file.getSize());
 
-            // 7. Возвращаем относительный путь для доступа
             return "/images/" + filename;
 
         } catch (IOException e) {
@@ -101,7 +94,6 @@ public class ImageServiceImpl implements ImageService {
         }
 
         try {
-            // Из URL получаем имя файла
             String filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
             Path imagePath = Paths.get(uploadDir, filename);
 
