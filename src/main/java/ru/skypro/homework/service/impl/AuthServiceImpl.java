@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Роль " + roleName + " не найдена"));
 
         UserEntity user = new UserEntity();
-        user.setEmail(register.getUsername()); // username = email
+        user.setEmail(register.getUsername());
         user.setPassword(encoder.encode(register.getPassword()));
         user.setFirstName(register.getFirstName());
         user.setLastName(register.getLastName());

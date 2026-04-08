@@ -17,13 +17,10 @@ public class FileStorageService {
 
     public File loadFileAsResource(String filePath) throws FileNotFoundException {
         try {
-            // Получаем абсолютный путь к папке загрузок
             Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
 
-            // Собираем полный путь к файлу
             Path file = uploadPath.resolve(filePath).normalize();
 
-            // БЕЗОПАСНОСТЬ: Проверяем, что файл находится внутри папки uploads
             if (!file.startsWith(uploadPath)) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Файл не найден");
             }

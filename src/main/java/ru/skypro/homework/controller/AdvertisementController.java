@@ -1,6 +1,5 @@
 package ru.skypro.homework.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,14 +15,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-import ru.skypro.homework.dto.Ad;
-import ru.skypro.homework.dto.CreateOrUpdateAd;
+import ru.skypro.homework.dto.*;
 import ru.skypro.homework.service.AdService;
 
 import javax.validation.Valid;
-import java.util.List;
-
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -34,7 +29,6 @@ import java.util.List;
 public class AdvertisementController {
 
     private final AdService adService;
-    private final ObjectMapper objectMapper;
 
     /**
      * GET /ads - Получение всех объявлений
@@ -42,8 +36,8 @@ public class AdvertisementController {
     @GetMapping
     @Operation(summary = "Получение всех объявлений", operationId = "getAllAds")
     @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(schema = @Schema(implementation = Ad.class)))
-    public ResponseEntity<List<Ad>> getAllAds() {
+            content = @Content(schema = @Schema(implementation = Ads.class)))
+    public ResponseEntity<Ads> getAllAds() {
         return ResponseEntity.ok(adService.getAllAds());
     }
 
@@ -51,10 +45,10 @@ public class AdvertisementController {
      * GET /ads/{id} - Получение информации об объявлении
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Получение информации об объявлении", operationId = "getAdById")
+    @Operation(summary = "Получение информации об объявлении", operationId = "getAds")
     @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(schema = @Schema(implementation = Ad.class)))
-    public ResponseEntity<Ad> getAdById(@Parameter(description = "ID объявления") @PathVariable Long id) {
+            content = @Content(schema = @Schema(implementation = ExtendedAd.class)))
+    public ResponseEntity<ExtendedAd> getAdById(@Parameter(description = "ID объявления") @PathVariable Integer id) {
         return ResponseEntity.ok(adService.getAdById(id));
     }
 
@@ -63,12 +57,12 @@ public class AdvertisementController {
      */
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Создание объявления", operationId = "createAd")
+    @Operation(summary = "Добавление объявления", operationId = "addAd")
     @ApiResponse(responseCode = "201", description = "Создано",
             content = @Content(schema = @Schema(implementation = Ad.class)))
     public ResponseEntity<Ad> createAd(
             @RequestPart("properties") @Valid CreateOrUpdateAd dto,
-            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart("image") MultipartFile image,
             Authentication authentication) {
 
         String email = authentication.getName();
@@ -83,10 +77,10 @@ public class AdvertisementController {
      * DELETE /ads/{id} - Удаление объявления
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Удаление объявления", operationId = "deleteAd")
+    @Operation(summary = "Удаление объявления", operationId = "removeAd")
     @ApiResponse(responseCode = "204", description = "Удалено")
     public ResponseEntity<Void> deleteAd(
-            @Parameter(description = "ID объявления") @PathVariable Long id,
+            @Parameter(description = "ID объявления") @PathVariable Integer id,
             Authentication authentication) {
 
         String email = authentication.getName();
@@ -100,11 +94,11 @@ public class AdvertisementController {
      * PATCH /ads/{id} - Обновление информации об объявлении
      */
     @PatchMapping("/{id}")
-    @Operation(summary = "Обновление информации об объявлении", operationId = "updateAd")
+    @Operation(summary = "Обновление информации об объявлении", operationId = "updateAds")
     @ApiResponse(responseCode = "200", description = "Обновлено",
             content = @Content(schema = @Schema(implementation = Ad.class)))
     public ResponseEntity<Ad> updateAd(
-            @Parameter(description = "ID объявления") @PathVariable Long id,
+            @Parameter(description = "ID объявления") @PathVariable Integer id,
             @Parameter(description = "Новые данные объявления") @Valid @RequestBody CreateOrUpdateAd request,
             Authentication authentication) {
 
@@ -119,10 +113,10 @@ public class AdvertisementController {
      * GET /ads/me - Получение объявлений текущего пользователя
      */
     @GetMapping("/me")
-    @Operation(summary = "Получение объявлений авторизованного пользователя", operationId = "getMyAds")
+    @Operation(summary = "Получение объявлений авторизованного пользователя", operationId = "getAdsMe")
     @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(schema = @Schema(implementation = Ad.class)))
-    public ResponseEntity<List<Ad>> getMyAds(Authentication authentication) {
+            content = @Content(schema = @Schema(implementation = Ads.class)))
+    public ResponseEntity<Ads> getMyAds(Authentication authentication) {
         String email = authentication.getName();
         return ResponseEntity.ok(adService.getMyAds(email));
     }
@@ -131,18 +125,20 @@ public class AdvertisementController {
      * PATCH /ads/{id}/image - Обновление изображения объявления
      */
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Обновление изображения объявления", operationId = "updateAdImage")
+    @Operation(summary = "Обновление изображения объявления", operationId = "updateImage")
     @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(schema = @Schema(implementation = Ad.class)))
-    public ResponseEntity<Ad> updateImage(
-            @Parameter(description = "ID объявления") @PathVariable Long id,
+            content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
+    public ResponseEntity<byte[]> updateImage(
+            @Parameter(description = "ID объявления") @PathVariable Integer id,
             @Parameter(description = "Файл изображения") @RequestParam("image") MultipartFile file,
             Authentication authentication) {
 
         String email = authentication.getName();
-        Ad updatedAd = adService.updateAdImage(id, file, email);
+        byte[] imageBytes = adService.updateAdImage(id, file, email);
 
         log.info("Изображение объявления {} обновлено пользователем {}", id, email);
-        return ResponseEntity.ok(updatedAd);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(imageBytes);
     }
 }

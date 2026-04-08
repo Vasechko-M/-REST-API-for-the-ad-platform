@@ -1,15 +1,14 @@
 package ru.skypro.homework.service;
 
 import ru.skypro.homework.dto.Comment;
+import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
-
-import java.util.List;
 
 public interface CommentService {
     /**
      * Возвращает комментарии по идентификатору объявления.
      */
-    List<Comment> getCommentsByAdId(Integer adId);
+    Comments getCommentsByAdId(Integer adId);
     /**
      * Добавляет комментарий к объявлению от текущего пользователя.
      */

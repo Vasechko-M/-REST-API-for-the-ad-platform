@@ -30,7 +30,6 @@ public class GlobalExceptionHandler {
  */
 @Getter
 class ErrorResponse {
-    // Getters и Setters (или используйте @Data Lombok)
     private final int status;
     private final String message;
     private final LocalDateTime timestamp;

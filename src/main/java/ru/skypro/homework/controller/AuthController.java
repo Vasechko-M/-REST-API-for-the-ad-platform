@@ -23,7 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Login login) {
+    public ResponseEntity<?> login(@Valid @RequestBody Login login) {
         if (authService.login(login.getUsername(), login.getPassword())) {
             return ResponseEntity.ok().build();
         } else {

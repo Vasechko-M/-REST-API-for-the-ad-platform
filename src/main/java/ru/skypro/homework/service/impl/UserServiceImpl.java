@@ -94,12 +94,10 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Файл пустой");
         }
 
-        // Удаляем старый аватар если был
         if (user.getImage() != null && !user.getImage().isEmpty()) {
             imageService.deleteImage(user.getImage());
         }
 
-        // Сохраняем новый аватар через сервис
         String imageUrl = imageService.saveImage(file);
         user.setImage(imageUrl);
 

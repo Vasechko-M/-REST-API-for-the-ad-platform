@@ -23,7 +23,7 @@ public class CommentMapper {
         if (entity.getAuthor() != null) {
             dto.setAuthor(entity.getAuthor().getId());
             dto.setAuthorFirstName(entity.getAuthor().getFirstName());
-            dto.setAuthorImage(entity.getAuthor().getImage()); // поле UserEntity.image
+            dto.setAuthorImage(entity.getAuthor().getImage());
         }
 
         return dto;

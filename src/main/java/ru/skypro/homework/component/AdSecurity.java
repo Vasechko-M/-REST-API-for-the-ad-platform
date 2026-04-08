@@ -16,7 +16,7 @@ public class AdSecurity {
         this.adRepository = adRepository;
     }
 
-    public boolean hasAccess(Long adId) {
+    public boolean hasAccess(Integer adId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         AdvertisementEntity ad = adRepository.findById(adId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));

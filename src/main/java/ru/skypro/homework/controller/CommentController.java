@@ -12,14 +12,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.dto.Comment;
+import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
-import java.util.List;
-
 @RestController
-@RequestMapping("/ads/{adId}/comments")
+@RequestMapping("/ads/{id}/comments")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Комментарии", description = "Управление комментариями объявлений")
@@ -32,11 +31,11 @@ public class CommentController {
      */
     @Operation(summary = "Получение комментариев объявления", operationId = "getComments")
     @ApiResponse(responseCode = "200", description = "Успешное получение комментариев",
-            content = @Content(schema = @Schema(implementation = Comment.class)))
+            content = @Content(schema = @Schema(implementation = Comments.class)))
     @GetMapping
-    public ResponseEntity<List<Comment>> getComments(
+    public ResponseEntity<Comments> getComments(
             @Parameter(description = "ID объявления", required = true)
-            @PathVariable Integer adId) {
+            @PathVariable("id") Integer adId) {
 
         return ResponseEntity.ok(commentService.getCommentsByAdId(adId));
     }
@@ -45,16 +44,16 @@ public class CommentController {
      * Добавление комментария (через SecurityContext)
      */
     @Operation(summary = "Добавление комментария", operationId = "addComment")
-    @ApiResponse(responseCode = "201", description = "Комментарий создан",
+    @ApiResponse(responseCode = "200", description = "Комментарий создан",
             content = @Content(schema = @Schema(implementation = Comment.class)))
     @PostMapping
     public ResponseEntity<Comment> addComment(
-            @PathVariable Integer adId,
+            @PathVariable("id") Integer adId,
             @Valid @RequestBody CreateOrUpdateComment commentRequest,
             Authentication authentication) {
         Comment newComment = commentService.addComment(adId, commentRequest, authentication.getName());
 
-        return ResponseEntity.status(201).body(newComment);
+        return ResponseEntity.ok(newComment);
     }
 
     /**
@@ -65,7 +64,7 @@ public class CommentController {
             content = @Content(schema = @Schema(implementation = Comment.class)))
     @PatchMapping("/{commentId}")
     public ResponseEntity<Comment> updateComment(
-            @PathVariable Integer adId,
+            @PathVariable("id") Integer adId,
             @PathVariable Integer commentId,
             @Valid @RequestBody CreateOrUpdateComment commentRequest) {
 
@@ -77,13 +76,13 @@ public class CommentController {
      * Удаление комментария (проверка через @PreAuthorize в сервисе)
      */
     @Operation(summary = "Удаление комментария", operationId = "deleteComment")
-    @ApiResponse(responseCode = "204", description = "Комментарий удален")
+    @ApiResponse(responseCode = "200", description = "Комментарий удален")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Integer adId,
+            @PathVariable("id") Integer adId,
             @PathVariable Integer commentId) {
 
         commentService.deleteComment(adId, commentId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

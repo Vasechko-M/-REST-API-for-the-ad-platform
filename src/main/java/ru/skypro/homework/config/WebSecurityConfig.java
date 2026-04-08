@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +62,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .cors()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 new AntPathRequestMatcher("/swagger-ui/**"),
@@ -72,8 +78,7 @@ public class WebSecurityConfig {
 
                         .requestMatchers(
                                 new AntPathRequestMatcher("/login"),
-                                new AntPathRequestMatcher("/register"),
-                                new AntPathRequestMatcher("/users/register", "POST")
+                                new AntPathRequestMatcher("/register")
                         ).permitAll()
 
                         .requestMatchers(
@@ -81,15 +86,13 @@ public class WebSecurityConfig {
                                 new AntPathRequestMatcher("/images/**", "GET")
                         ).permitAll()
 
-                        .requestMatchers(
-                                new AntPathRequestMatcher("/ads/**"),
-                                new AntPathRequestMatcher("/images/upload", "POST"),
-                                new AntPathRequestMatcher("/users/**")
-                        ).permitAll()
-
                         .anyRequest().authenticated()
                 )
-                .httpBasic();
+                .httpBasic()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) ->
+                        response.sendError(401, "Unauthorized"));
 
         return http.build();
     }

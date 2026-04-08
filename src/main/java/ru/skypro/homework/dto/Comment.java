@@ -2,12 +2,12 @@ package ru.skypro.homework.dto;
 
 public class Comment {
 
-    private Integer pk;               // id комментария
-    private Integer author;           // id автора комментария
-    private String authorImage;       // ссылка на аватар автора комментария
-    private String authorFirstName;   // имя создателя комментария
-    private Long createdAt;           // дата и время создания в мс с 01.01.1970
-    private String text;              // текст комментария
+    private Integer pk;
+    private Integer author;
+    private String authorImage;
+    private String authorFirstName;
+    private Long createdAt;
+    private String text;
 
     public Comment() {
     }

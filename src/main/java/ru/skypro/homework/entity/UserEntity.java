@@ -30,11 +30,6 @@ public class UserEntity {
 
     @Column(name = "phone")
     private String phone;
-
-//    @Enumerated(EnumType.STRING)
-//    @Column(nullable = false)
-//    private RoleEnum role;
-
     @Column(name = "image")
     private String image;
     @Column(name = "password")

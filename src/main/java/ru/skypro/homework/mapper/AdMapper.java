@@ -13,7 +13,6 @@ public class AdMapper {
         dto.setPk(entity.getId());
         dto.setTitle(entity.getTitle());
         dto.setPrice(entity.getPrice());
-        //dto.setDescription(entity.getDescription());
         dto.setImage(entity.getImage());
         if (entity.getAuthor() != null) {
             dto.setAuthor(entity.getAuthor().getId());

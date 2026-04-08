@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.dto.Ad;
+import ru.skypro.homework.dto.Ads;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
+import ru.skypro.homework.dto.ExtendedAd;
 import ru.skypro.homework.entity.AdvertisementEntity;
 import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.mapper.AdMapper;
@@ -38,10 +40,14 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public List<Ad> getAllAds() {
-        return adRepository.findAll().stream()
+    public Ads getAllAds() {
+        List<Ad> ads = adRepository.findAll().stream()
                 .map(adMapper::toDto)
                 .toList();
+        return Ads.builder()
+                .count(ads.size())
+                .results(ads)
+                .build();
     }
 
     @Override
@@ -65,15 +71,26 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public Ad getAdById(Long id) {
+    public ExtendedAd getAdById(Integer id) {
         AdvertisementEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
-        return adMapper.toDto(ad);
+        UserEntity author = ad.getAuthor();
+        return ExtendedAd.builder()
+                .pk(ad.getId())
+                .authorFirstName(author != null ? author.getFirstName() : null)
+                .authorLastName(author != null ? author.getLastName() : null)
+                .description(ad.getDescription())
+                .email(author != null ? author.getEmail() : null)
+                .image(ad.getImage())
+                .phone(author != null ? author.getPhone() : null)
+                .price(ad.getPrice())
+                .title(ad.getTitle())
+                .build();
     }
 
-    @PreAuthorize("@adSecurity.hasAccess(#id, #email)")
+    @PreAuthorize("@adSecurity.hasAccess(#id)")
     @Override
-    public void deleteAd(Long id, String email) {
+    public void deleteAd(Integer id, String email) {
         AdvertisementEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
 
@@ -85,9 +102,9 @@ public class AdServiceImpl implements AdService {
         log.info("Удалено объявление {} пользователем {}", id, email);
     }
 
-    @PreAuthorize("@adSecurity.hasAccess(#id, #email)")
+    @PreAuthorize("@adSecurity.hasAccess(#id)")
     @Override
-    public Ad updateAd(Long id, CreateOrUpdateAd request, String email) {
+    public Ad updateAd(Integer id, CreateOrUpdateAd request, String email) {
 
         AdvertisementEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
@@ -102,19 +119,23 @@ public class AdServiceImpl implements AdService {
     }
 
     @Override
-    public List<Ad> getMyAds(String email) {
+    public Ads getMyAds(String email) {
 
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        return adRepository.findAllByAuthor(user).stream()
+        List<Ad> ads = adRepository.findAllByAuthor(user).stream()
                 .map(adMapper::toDto)
                 .toList();
+        return Ads.builder()
+                .count(ads.size())
+                .results(ads)
+                .build();
     }
 
-    @PreAuthorize("@adSecurity.hasAccess(#id, #email)")
+    @PreAuthorize("@adSecurity.hasAccess(#id)")
     @Override
-    public Ad updateAdImage(Long id, MultipartFile file, String email) {
+    public byte[] updateAdImage(Integer id, MultipartFile file, String email) {
 
         AdvertisementEntity ad = adRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
@@ -132,10 +153,12 @@ public class AdServiceImpl implements AdService {
 
         AdvertisementEntity saved = adRepository.save(ad);
         log.info("Обновлено изображение объявления {} пользователем {}", id, email);
-        return adMapper.toDto(saved);
+
+        String imageName = saved.getImage().substring(saved.getImage().lastIndexOf("/") + 1);
+        return imageService.getImage(imageName);
     }
 
-    public boolean isAuthor(Long adId, String email) {
+    public boolean isAuthor(Integer adId, String email) {
         AdvertisementEntity ad = adRepository.findById(adId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
         return ad.getAuthor().getEmail().equals(email);

@@ -87,10 +87,9 @@ public class UserController {
      */
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Обновление аватара авторизованного пользователя", operationId = "updateUserImage")
-    @ApiResponse(responseCode = "200", description = "OK",
-            content = @Content(schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    public ResponseEntity<User> updateUserImage(
+    public ResponseEntity<Void> updateUserImage(
             @Parameter(description = "Файл изображения")
             @RequestParam("image") MultipartFile file,
             Authentication authentication) {
@@ -98,11 +97,9 @@ public class UserController {
         String email = authentication.getName();
         userService.updateUserImage(file, email);
 
-        User updatedUser = userService.getCurrentUser(email);
-
         log.info("Аватар обновлен для пользователя: {}", email);
 
-        return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.ok().build();
     }
 
     /**

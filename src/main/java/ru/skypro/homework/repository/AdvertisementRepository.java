@@ -8,8 +8,8 @@ import ru.skypro.homework.entity.UserEntity;
 import java.util.List;
 import java.util.Optional;
 @Repository
-public interface AdvertisementRepository extends JpaRepository<AdvertisementEntity, Long> {
+public interface AdvertisementRepository extends JpaRepository<AdvertisementEntity, Integer> {
 List<AdvertisementEntity> findAllByAuthor(UserEntity author);
 
-    Optional<Object> findAuthorEmailById(Long adId);
+    Optional<Object> findAuthorEmailById(Integer adId);
 }

@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.skypro.homework.dto.Comment;
+import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.entity.AdvertisementEntity;
 import ru.skypro.homework.entity.CommentEntity;
@@ -37,16 +38,20 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentsByAdId(Integer adId) {
+    public Comments getCommentsByAdId(Integer adId) {
         List<CommentEntity> commentEntities = commentRepository.findByAdId(adId);
-        return commentEntities.stream()
+        List<Comment> results = commentEntities.stream()
                 .map(commentMapper::toDto)
                 .toList();
+        return Comments.builder()
+                .count(results.size())
+                .results(results)
+                .build();
     }
 
     @Override
     public Comment addComment(Integer adId, CreateOrUpdateComment commentRequest, String authorEmail) {
-        AdvertisementEntity ad = advertisementRepository.findById(adId.longValue())
+        AdvertisementEntity ad = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Объявление не найдено"));
 
         UserEntity author = userRepository.findByEmail(authorEmail)
