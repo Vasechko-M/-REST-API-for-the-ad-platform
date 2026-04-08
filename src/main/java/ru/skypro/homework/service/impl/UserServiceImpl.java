@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,12 +16,10 @@ import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.repository.RoleRepository;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.ImageService;
 import ru.skypro.homework.service.UserService;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -29,49 +28,38 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
+    private final ImageService imageService;
 
-    private static final String UPLOAD_DIR = "images/";
-
-    /**
-     * Смена пароля (только сам пользователь или ADMIN)
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public void changePassword(NewPassword newPassword, String email) {
-
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
         if (!passwordEncoder.matches(newPassword.getCurrentPassword(), user.getPassword())) {
-            throw new RuntimeException("Неверный текущий пароль");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Неверный текущий пароль");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
         userRepository.save(user);
+
+        log.info("Пароль изменен для пользователя: {}", email);
     }
 
-    /**
-     * Получение текущего пользователя
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public User getCurrentUser(String email) {
-
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
         return userMapper.toDto(user);
     }
 
-    /**
-     * Обновление профиля
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public UpdateUser updateUser(UpdateUser updateUser, String email) {
-
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
         if (updateUser.getFirstName() != null) {
             user.setFirstName(updateUser.getFirstName());
@@ -87,6 +75,8 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
+        log.info("Профиль обновлен для пользователя: {}", email);
+
         return UpdateUser.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -94,42 +84,29 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    /**
-     * Обновление аватара
-     */
     @PreAuthorize("#email == authentication.name or hasRole('ADMIN')")
     @Override
     public void updateUserImage(MultipartFile file, String email) {
-
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
 
-        if (file.isEmpty()) {
-            throw new RuntimeException("Файл пустой");
+        if (file == null || file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Файл пустой");
         }
 
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-        File directory = new File(UPLOAD_DIR);
-        if (!directory.exists()) {
-            directory.mkdirs();
+        // Удаляем старый аватар если был
+        if (user.getImage() != null && !user.getImage().isEmpty()) {
+            imageService.deleteImage(user.getImage());
         }
 
-        File destination = new File(UPLOAD_DIR + fileName);
+        // Сохраняем новый аватар через сервис
+        String imageUrl = imageService.saveImage(file);
+        user.setImage(imageUrl);
 
-        try {
-            file.transferTo(destination);
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка загрузки файла");
-        }
-
-        user.setImage("/images/" + fileName);
         userRepository.save(user);
+        log.info("Аватар обновлен для пользователя: {}, путь: {}", email, imageUrl);
     }
 
-    /**
-     * Регистрация пользователя
-     */
     public void registerUser(User userDto, String password) {
         if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Пользователь с таким email уже существует");
@@ -144,5 +121,7 @@ public class UserServiceImpl implements UserService {
 
         userEntity.setRole(role);
         userRepository.save(userEntity);
+
+        log.info("Зарегистрирован новый пользователь: {}", userDto.getEmail());
     }
 }

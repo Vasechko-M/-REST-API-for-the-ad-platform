@@ -15,16 +15,21 @@ public class AdvertisementEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     private String imagePath;
 
+    @Column(name = "title")
     private String title;
 
+    @Column(name = "description")
     private String description;
 
+    @Column(name = "price")
     private Integer price;
 
+    @Column(name = "image")
     private String image;
 
     @ManyToOne

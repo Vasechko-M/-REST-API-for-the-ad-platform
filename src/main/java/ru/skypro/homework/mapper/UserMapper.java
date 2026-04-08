@@ -28,7 +28,7 @@ public class UserMapper {
         entity.setFirstName(dto.getFirstName());
         entity.setLastName(dto.getLastName());
         entity.setPhone(dto.getPhone());
-        entity.setImage(dto.getImage()); // если нужно
+        entity.setImage(dto.getImage());
 
         if (dto.getRole() != null) {
             RoleEntity roleEntity = new RoleEntity();

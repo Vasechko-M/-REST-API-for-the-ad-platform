@@ -61,9 +61,6 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.toDto(saved);
     }
 
-    /**
-     * Обновление комментария (только автор или ADMIN)
-     */
     @PreAuthorize("@commentSecurity.hasAccess(#commentId)")
     @Override
     public Comment updateComment(Integer adId, Integer commentId, CreateOrUpdateComment commentRequest) {
@@ -81,9 +78,6 @@ public class CommentServiceImpl implements CommentService {
         return commentMapper.toDto(updated);
     }
 
-    /**
-     * Удаление комментария (только автор или ADMIN)
-     */
     @PreAuthorize("@commentSecurity.hasAccess(#commentId)")
     @Override
     public void deleteComment(Integer adId, Integer commentId) {

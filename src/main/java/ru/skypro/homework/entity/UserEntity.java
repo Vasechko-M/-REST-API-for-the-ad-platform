@@ -16,9 +16,10 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Column(name = "first_name")
@@ -27,16 +28,19 @@ public class UserEntity {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "phone")
     private String phone;
 
 //    @Enumerated(EnumType.STRING)
 //    @Column(nullable = false)
 //    private RoleEnum role;
 
+    @Column(name = "image")
     private String image;
-    private  String password;
+    @Column(name = "password")
+    private String password;
 
-    @Column(nullable = false)
+    @Column(name = "enabled", nullable = false)
     private Boolean enabled = true;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)

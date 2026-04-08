@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +17,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.*;
 import ru.skypro.homework.service.UserService;
-import lombok.Data;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Пользователи", description = "Управление профилем пользователя")
 public class UserController {
+
     private final UserService userService;
 
     /**
@@ -36,16 +38,14 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "403", description = "Forbidden")
-    public ResponseEntity<Void> changePassword(@Valid @RequestBody NewPassword request,
-                                               Authentication authentication
-    ) {
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody NewPassword request,
+            Authentication authentication) {
 
-        String email = authentication.getName(); // 👈 текущий пользователь
-
+        String email = authentication.getName();
         userService.changePassword(request, email);
 
         return ResponseEntity.ok().build();
-
     }
 
     /**
@@ -58,12 +58,10 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     public ResponseEntity<User> getCurrentUser(Authentication authentication) {
 
-        String email = authentication.getName(); // 👈 текущий пользователь
-
+        String email = authentication.getName();
         User user = userService.getCurrentUser(email);
 
         return ResponseEntity.ok(user);
-
     }
 
     /**
@@ -74,12 +72,11 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "OK",
             content = @Content(schema = @Schema(implementation = UpdateUser.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    public ResponseEntity<UpdateUser> updateUserInfo(@Valid @RequestBody UpdateUser updateData,Authentication
-                                                     authentication) {
-
+    public ResponseEntity<UpdateUser> updateUserInfo(
+            @Valid @RequestBody UpdateUser updateData,
+            Authentication authentication) {
 
         String email = authentication.getName();
-
         UpdateUser updatedUser = userService.updateUser(updateData, email);
 
         return ResponseEntity.ok(updatedUser);
@@ -90,28 +87,23 @@ public class UserController {
      */
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Обновление аватара авторизованного пользователя", operationId = "updateUserImage")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Файл изображения",
-            required = true,
-            content = @Content(
-                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                    schema = @Schema(implementation = UpdateUserImageRequest.class)
-            )
-    )
-    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = User.class)))
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    public ResponseEntity<Void> updateUserImage(
-            @Parameter(description = "Файл изображения") @RequestParam("image") MultipartFile file,
+    public ResponseEntity<User> updateUserImage(
+            @Parameter(description = "Файл изображения")
+            @RequestParam("image") MultipartFile file,
             Authentication authentication) {
 
-
-
         String email = authentication.getName();
-
         userService.updateUserImage(file, email);
 
-        return ResponseEntity.ok().build();
+        // Возвращаем обновленного пользователя с новым URL аватара
+        User updatedUser = userService.getCurrentUser(email);
 
+        log.info("Аватар обновлен для пользователя: {}", email);
+
+        return ResponseEntity.ok(updatedUser);
     }
 
     /**
@@ -119,22 +111,15 @@ public class UserController {
      */
     @PostMapping("/register")
     @Operation(summary = "Регистрация нового пользователя", operationId = "registerUser")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Данные нового пользователя с паролем",
-            required = true,
-            content = @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = RegisterUserRequest.class)
-            )
-    )
     @ApiResponse(responseCode = "201", description = "Пользователь зарегистрирован")
+    @ApiResponse(responseCode = "400", description = "Bad Request")
     public ResponseEntity<Void> registerUser(@Valid @RequestBody RegisterUserRequest request) {
         userService.registerUser(request.getUser(), request.getPassword());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     // Вспомогательный класс для запроса регистрации
-    @Data
+    @lombok.Data
     public static class RegisterUserRequest {
         @Valid
         private User user;
@@ -142,6 +127,5 @@ public class UserController {
         @javax.validation.constraints.NotBlank(message = "Пароль обязателен")
         @javax.validation.constraints.Size(min = 6, message = "Пароль должен содержать минимум 6 символов")
         private String password;
-
     }
 }
