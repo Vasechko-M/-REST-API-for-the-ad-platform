@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * Сущность роли пользователя для хранения роли (например, USER или ADMIN).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -15,6 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Реализация сервиса для работы с изображениями.
+ * Включает сохранение, удаление и чтение изображений.
+ * Обеспечивает проверку типов и расширений файлов, а также обработку ошибок при работе с файлами.
+ */
 @Slf4j
 @Service
 public class ImageServiceImpl implements ImageService {

@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * DTO-класс, представляющий пользователя.
+ * Включает ID, email (логин), имя, фамилию, телефон, роль и ссылку на аватар.
+ */
 @Data
 @Builder
 @NoArgsConstructor

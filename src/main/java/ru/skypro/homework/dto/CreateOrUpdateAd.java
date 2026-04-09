@@ -2,6 +2,10 @@ package ru.skypro.homework.dto;
 
 import javax.validation.constraints.*;
 
+/**
+ * DTO-класс для создания или обновления объявления.
+ * Включает заголовок, цену и описание с необходимыми валидациями.
+ */
 public class CreateOrUpdateAd {
     @NotBlank
     @Size(min = 4, max = 32)

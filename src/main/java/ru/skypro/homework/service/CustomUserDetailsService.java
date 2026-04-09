@@ -10,6 +10,10 @@ import ru.skypro.homework.repository.UserRepository;
 
 import java.util.Optional;
 
+/**
+ * Реализация сервиса пользовательских деталей для Spring Security.
+ * Загружает пользователя по email, устанавливает роль и статус.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -19,6 +23,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Загружает пользователя по email и возвращает объект UserDetails для Spring Security.
+     * Генерирует роль и устанавливает статус аккаунта.
+     *
+     * @param email адрес электронной почты пользователя.
+     * @return UserDetails объект с информацией о пользователе.
+     * @throws UsernameNotFoundException если пользователь не найден.
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 

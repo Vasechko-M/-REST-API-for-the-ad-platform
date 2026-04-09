@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * DTO-класс, расширяющий модель объявления.
+ * Включает дополнительную информацию о авторе, описание, контакты и изображение.
+ */
 @Data
 @Builder
 @NoArgsConstructor

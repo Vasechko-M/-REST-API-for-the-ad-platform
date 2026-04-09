@@ -9,12 +9,23 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Сервис для работы с файлами хранения.
+ * Обеспечивает загрузку файла по пути, с защитой от выхода за пределы директории.
+ */
 @Service
 public class FileStorageService {
 
     @Value("${file.upload-dir:uploads/images/}")
     private String uploadDir;
 
+    /**
+     * Загружает файл по пути, проверяя его существование и безопасность.
+     *
+     * @param filePath относительный путь к файлу.
+     * @return файл в виде объекта File.
+     * @throws FileNotFoundException если файл не найден или недоступен.
+     */
     public File loadFileAsResource(String filePath) throws FileNotFoundException {
         try {
             Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();

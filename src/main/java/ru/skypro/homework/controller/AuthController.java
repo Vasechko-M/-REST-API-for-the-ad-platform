@@ -14,6 +14,10 @@ import ru.skypro.homework.service.AuthService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для обработки HTTP-запросов, связанных с аутентификацией и регистрацией пользователей.
+ * Обеспечивает API-методы для входа в систему и регистрации новых пользователей.
+ */
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController

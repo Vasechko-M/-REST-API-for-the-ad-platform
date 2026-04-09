@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO-класс, представляющий ответ после загрузки изображения.
+ * Включает ID изображения, URL, размер, тип файла и оригинальное имя.
+ */
 @Data
 @Builder
 @NoArgsConstructor

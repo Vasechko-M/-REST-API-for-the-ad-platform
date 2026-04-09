@@ -2,6 +2,10 @@ package ru.skypro.homework.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Интерфейс для работы с изображениями.
+ * Включает сохранение, удаление и получение изображений.
+ */
 public interface ImageService {
 
     /**

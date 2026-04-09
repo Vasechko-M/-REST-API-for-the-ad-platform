@@ -19,6 +19,11 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.ImageService;
 import ru.skypro.homework.service.UserService;
 
+/**
+ * Реализация сервиса пользователя.
+ * Обеспечивает управление профилем пользователя, его паролем, изображением и регистрацией.
+ * Включает операции обновления данных пользователя, смены пароля и аватара с проверками авторизации.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

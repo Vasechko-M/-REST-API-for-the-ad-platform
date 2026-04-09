@@ -7,6 +7,10 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * DTO-класс для обновления данных пользователя.
+ * Включает имя, фамилию и телефон с валидациями.
+ */
 @Data
 @Builder
 @NoArgsConstructor

@@ -6,6 +6,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+/**
+ * DTO-класс для регистрации нового пользователя.
+ * Включает логин, пароль, имя, фамилию, телефон и роль.
+ */
 @Data
 public class Register {
 

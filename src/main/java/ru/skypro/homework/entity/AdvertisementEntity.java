@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Сущность объявления, отображающая информацию об объявлении.
+ * Включает идентификатор, изображение, название, описание, цену,
+ * автора и список комментариев.
+ */
 @Entity
 @Table(name = "advertisements")
 @Data

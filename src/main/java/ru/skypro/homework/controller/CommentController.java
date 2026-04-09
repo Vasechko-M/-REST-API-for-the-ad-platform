@@ -17,6 +17,11 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.service.CommentService;
 
 import javax.validation.Valid;
+
+/**
+ * Контроллер для обработки HTTP-запросов, связанных с управлением комментариями к объявлениям.
+ * Предоставляет API-методы для получения, добавления, обновления и удаления комментариев.
+ */
 @RestController
 @RequestMapping("/ads/{id}/comments")
 @RequiredArgsConstructor
@@ -26,9 +31,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    /**
-     * Получение комментариев объявления
-     */
     @Operation(summary = "Получение комментариев объявления", operationId = "getComments")
     @ApiResponse(responseCode = "200", description = "Успешное получение комментариев",
             content = @Content(schema = @Schema(implementation = Comments.class)))
@@ -40,9 +42,6 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsByAdId(adId));
     }
 
-    /**
-     * Добавление комментария (через SecurityContext)
-     */
     @Operation(summary = "Добавление комментария", operationId = "addComment")
     @ApiResponse(responseCode = "200", description = "Комментарий создан",
             content = @Content(schema = @Schema(implementation = Comment.class)))
@@ -56,9 +55,6 @@ public class CommentController {
         return ResponseEntity.ok(newComment);
     }
 
-    /**
-     * Обновление комментария (проверка через @PreAuthorize в сервисе)
-     */
     @Operation(summary = "Обновление комментария", operationId = "updateComment")
     @ApiResponse(responseCode = "200", description = "Комментарий обновлен",
             content = @Content(schema = @Schema(implementation = Comment.class)))
@@ -72,9 +68,6 @@ public class CommentController {
         return ResponseEntity.ok(updatedComment);
     }
 
-    /**
-     * Удаление комментария (проверка через @PreAuthorize в сервисе)
-     */
     @Operation(summary = "Удаление комментария", operationId = "deleteComment")
     @ApiResponse(responseCode = "200", description = "Комментарий удален")
     @DeleteMapping("/{commentId}")

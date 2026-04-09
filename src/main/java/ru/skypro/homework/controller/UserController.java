@@ -20,6 +20,10 @@ import ru.skypro.homework.service.UserService;
 
 import javax.validation.Valid;
 
+/**
+ * Контроллер для обработки HTTP-запросов, связанных с управлением профилем пользователя.
+ * Предоставляет API-методы для получения, обновления информации, изменения пароля и аватара авторизованного пользователя.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/users")
@@ -30,9 +34,6 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * POST /users/set_password - Обновление пароля
-     */
     @PostMapping("/set_password")
     @Operation(summary = "Обновление пароля", operationId = "setPassword")
     @ApiResponse(responseCode = "200", description = "OK")
@@ -48,9 +49,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * GET /users/me - Получение информации об авторизованном пользователе
-     */
     @GetMapping("/me")
     @Operation(summary = "Получение информации об авторизованном пользователе", operationId = "getUser")
     @ApiResponse(responseCode = "200", description = "OK",
@@ -64,9 +62,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    /**
-     * PATCH /users/me - Обновление информации об авторизованном пользователе
-     */
     @PatchMapping("/me")
     @Operation(summary = "Обновление информации об авторизованном пользователе", operationId = "updateUser")
     @ApiResponse(responseCode = "200", description = "OK",
@@ -82,9 +77,6 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    /**
-     * PATCH /users/me/image - Обновление аватара авторизованного пользователя
-     */
     @PatchMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Обновление аватара авторизованного пользователя", operationId = "updateUserImage")
     @ApiResponse(responseCode = "200", description = "OK")

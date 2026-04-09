@@ -19,6 +19,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.CustomUserDetailsService;
 
+/**
+ * Конфигурационный класс для настройки безопасности в приложении.
+ * В этом классе задаются правила авторизации, настройки CORS, обработка аутентификации.
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -31,11 +35,23 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Bean для получения данных о пользователе.
+     * Использует сервис CustomUserDetailsService, который работает с UserRepository.
+     *
+     * @return сервис деталей пользователя.
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService(userRepository);
     }
 
+    /**
+     * Bean для провайдера аутентификации.
+     * Использует ранее определенный UserDetailsService и PasswordEncoder.
+     *
+     * @return провайдер аутентификации.
+     */
     @Bean public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService());
@@ -43,7 +59,10 @@ public class WebSecurityConfig {
     }
 
     /**
-     * Настройка CORS для Swagger и фронтенда
+     * Настройка CORS для проекта.
+     * Позволяет фронтенду и Swagger обращаться к API с любого происхождения.
+     *
+     * @return источник конфигурации CORS.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -58,6 +77,14 @@ public class WebSecurityConfig {
         return source;
     }
 
+    /**
+     * Основная настройка фильтров безопасности.
+     * Определяет, какие маршруты доступны без авторизации, а какие требуют авторизации.
+     *
+     * @param http главный объект конфигурации HttpSecurity.
+     * @return настроенное SecurityFilterChain.
+     * @throws Exception возможные ошибки при настройке.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

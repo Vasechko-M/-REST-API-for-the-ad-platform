@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Сущность комментария, связанная с объявлением и автором.
+ * Включает идентификатор, текст, дату создания, автора и объявление.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

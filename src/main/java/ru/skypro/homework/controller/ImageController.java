@@ -16,6 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.ImageUploadResponse;
 import ru.skypro.homework.service.ImageService;
 
+/**
+ * Контроллер для обработки HTTP-запросов, связанных с загрузкой и получением изображений.
+ * Обеспечивает API-методы для загрузки изображений на сервер и получения изображений по их идентификаторам.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/images")
@@ -25,9 +29,6 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    /**
-     * Загрузка изображения
-     */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Загрузка изображения", operationId = "uploadImage")
     @ApiResponse(responseCode = "201", description = "Изображение успешно загружено",
@@ -56,9 +57,6 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /**
-     * Получение изображения
-     */
     @GetMapping("/{id}")
     @Operation(summary = "Получение изображения", operationId = "getImage")
     public ResponseEntity<byte[]> getImage(

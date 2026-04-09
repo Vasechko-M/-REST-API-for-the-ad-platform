@@ -19,6 +19,12 @@ import ru.skypro.homework.dto.*;
 import ru.skypro.homework.service.AdService;
 
 import javax.validation.Valid;
+
+/**
+ * Контроллер для обработки HTTP-запросов, связанных с объявлениями.
+ * Обеспечивает API-методы для получения, создания, обновления и удаления объявлений,
+ * а также управление изображениями объявлений.
+ */
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -30,9 +36,6 @@ public class AdvertisementController {
 
     private final AdService adService;
 
-    /**
-     * GET /ads - Получение всех объявлений
-     */
     @GetMapping
     @Operation(summary = "Получение всех объявлений", operationId = "getAllAds")
     @ApiResponse(responseCode = "200", description = "OK",
@@ -41,9 +44,6 @@ public class AdvertisementController {
         return ResponseEntity.ok(adService.getAllAds());
     }
 
-    /**
-     * GET /ads/{id} - Получение информации об объявлении
-     */
     @GetMapping("/{id}")
     @Operation(summary = "Получение информации об объявлении", operationId = "getAds")
     @ApiResponse(responseCode = "200", description = "OK",
@@ -51,10 +51,6 @@ public class AdvertisementController {
     public ResponseEntity<ExtendedAd> getAdById(@Parameter(description = "ID объявления") @PathVariable Integer id) {
         return ResponseEntity.ok(adService.getAdById(id));
     }
-
-    /**
-     * POST /ads - Создание нового объявления
-     */
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Добавление объявления", operationId = "addAd")
@@ -72,10 +68,6 @@ public class AdvertisementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newAd);
     }
 
-
-    /**
-     * DELETE /ads/{id} - Удаление объявления
-     */
     @DeleteMapping("/{id}")
     @Operation(summary = "Удаление объявления", operationId = "removeAd")
     @ApiResponse(responseCode = "204", description = "Удалено")
@@ -90,9 +82,6 @@ public class AdvertisementController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * PATCH /ads/{id} - Обновление информации об объявлении
-     */
     @PatchMapping("/{id}")
     @Operation(summary = "Обновление информации об объявлении", operationId = "updateAds")
     @ApiResponse(responseCode = "200", description = "Обновлено",
@@ -109,9 +98,6 @@ public class AdvertisementController {
         return ResponseEntity.ok(updatedAd);
     }
 
-    /**
-     * GET /ads/me - Получение объявлений текущего пользователя
-     */
     @GetMapping("/me")
     @Operation(summary = "Получение объявлений авторизованного пользователя", operationId = "getAdsMe")
     @ApiResponse(responseCode = "200", description = "OK",
@@ -121,9 +107,6 @@ public class AdvertisementController {
         return ResponseEntity.ok(adService.getMyAds(email));
     }
 
-    /**
-     * PATCH /ads/{id}/image - Обновление изображения объявления
-     */
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Обновление изображения объявления", operationId = "updateImage")
     @ApiResponse(responseCode = "200", description = "OK",

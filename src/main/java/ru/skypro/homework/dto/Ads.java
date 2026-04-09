@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.List;
 
+/**
+ * DTO-класс, представляющий контейнер для списка объявлений.
+ * Включает общее количество объявлений и список их деталей.
+ */
 @Data
 @Builder
 @NoArgsConstructor

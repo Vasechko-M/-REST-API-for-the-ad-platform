@@ -20,6 +20,11 @@ import ru.skypro.homework.service.ImageService;
 
 import java.util.List;
 
+/**
+ * Реализация сервиса для работы с объявлениями.
+ * Включает операции получения, создания, обновления, удаления объявлений и работу с изображениями.
+ * Обеспечивает основные бизнес-операции, связанные с объявлениями.
+ */
 @Slf4j
 @Service
 public class AdServiceImpl implements AdService {

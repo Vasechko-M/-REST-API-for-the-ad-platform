@@ -10,6 +10,11 @@ import ru.skypro.homework.repository.RoleRepository;
 import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AuthService;
 
+/**
+ * Реализация сервиса для аутентификации и регистрации пользователей.
+ * Обеспечивает вход по электронной почте и паролю, а также регистрацию новых пользователей с назначением ролей.
+ * Использует шифрование паролей и проверку существующих пользователей.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {

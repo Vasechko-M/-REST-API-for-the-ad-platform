@@ -5,6 +5,10 @@ import ru.skypro.homework.dto.Ad;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.entity.AdvertisementEntity;
 
+/**
+ * Маппер для преобразования между сущностью объявления (AdvertisementEntity)
+ * и DTO (Ad). Также содержит методы для создания и обновления сущности по DTO.
+ */
 @Component
 public class AdMapper {
 

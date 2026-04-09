@@ -19,6 +19,11 @@ import ru.skypro.homework.service.CommentService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Реализация сервиса для работы с комментариями.
+ * Включает операции получения комментариев по объявлению, добавление, обновление и удаление комментариев.
+ * Использует проверку доступа для редактирования и удаления комментариев.
+ */
 @Service
 public class CommentServiceImpl implements CommentService {
 

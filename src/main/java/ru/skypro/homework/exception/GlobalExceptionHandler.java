@@ -8,11 +8,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 
+/**
+ * Глобальный обработчик исключений приложения.
+ * Перехватывает исключения, например, ForbiddenException,
+ * и возвращает структурированный ответ с кодом ошибки.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * Обрабатывает наше кастомное исключение ForbiddenException
+     * Обрабатывает исключение ForbiddenException и возвращает ответ
+     * с кодом 403 (Forbidden) и информацией об ошибке.
+     *
+     * @param ex исключение ForbiddenException
+     * @return ResponseEntity с телом ошибки и статусом 403
      */
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex) {
@@ -26,7 +35,8 @@ public class GlobalExceptionHandler {
 }
 
 /**
- * DTO для тела ответа при ошибке.
+ * DTO для ответа при ошибке.
+ * Включает статус, сообщение и дату/время ошибки.
  */
 @Getter
 class ErrorResponse {
@@ -39,5 +49,4 @@ class ErrorResponse {
         this.message = message;
         this.timestamp = timestamp;
     }
-
 }

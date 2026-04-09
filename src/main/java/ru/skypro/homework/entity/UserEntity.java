@@ -7,6 +7,11 @@ import lombok.AllArgsConstructor;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Сущность пользователя, включающая идентификатор, email, имя, фамилию,
+ * телефон, изображение, пароль, статус активности, список объявлений и комментариев,
+ * а также роль.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
