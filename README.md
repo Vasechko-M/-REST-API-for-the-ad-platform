@@ -12,11 +12,9 @@
 
 ## Демонстрационное изображение проекта
 
-<p align="center">
-  <img alt="Демонстрационное изображение приложения" width="800" id="019d7686-2b47-70c8-a366-76fc4946bddd"/>
-</p>
+<img width="2957" height="1859" alt="Screenshot 2026-04-10 171332" src="https://github.com/user-attachments/assets/803d4e8a-ce55-47ab-b2b7-8770cd8f4c01" />
 
-<h3 align="center">Главная страница приложения</h3>
+<h3 align="center">Страница профиля приложения</h3>
 
 ## Участники проекта
 
