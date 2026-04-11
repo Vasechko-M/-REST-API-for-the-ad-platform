@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,12 +13,12 @@ import ru.skypro.homework.entity.RoleEntity;
 import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.repository.RoleRepository;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.impl.AuthServiceImpl;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

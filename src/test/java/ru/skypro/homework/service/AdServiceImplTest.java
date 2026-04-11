@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import ru.skypro.homework.entity.UserEntity;
 import ru.skypro.homework.mapper.AdMapper;
 import ru.skypro.homework.repository.AdvertisementRepository;
 import ru.skypro.homework.repository.UserRepository;
-import ru.skypro.homework.service.ImageService;
+import ru.skypro.homework.service.impl.AdServiceImpl;
 
 import java.util.Optional;
 
