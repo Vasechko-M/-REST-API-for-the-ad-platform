@@ -18,11 +18,11 @@ import lombok.AllArgsConstructor;
 @Schema(description = "Модель для обновления данных пользователя")
 public class UpdateUser {
 
-    @Size(min = 3, max = 10, message = "Имя должно быть от 3 до 10 символов")
+    @Size(min = 2, max = 16, message = "Имя должно быть от 2 до 16 символов")
     @Schema(description = "имя пользователя", example = "Иван", minLength = 3, maxLength = 10)
     private String firstName;
 
-    @Size(min = 3, max = 10, message = "Фамилия должна быть от 3 до 10 символов")
+    @Size(min = 2, max = 16, message = "Фамилия должна быть от 2 до 16 символов")
     @Schema(description = "фамилия пользователя", example = "Иванов", minLength = 3, maxLength = 10)
     private String lastName;
 
